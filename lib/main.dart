@@ -5,10 +5,11 @@ import 'package:tbr_test_task/theme/theme.dart';
 import 'package:tbr_test_task/views/home_screen.dart';
 import 'package:tbr_test_task/services/rocket_service.dart';
 import 'blocs/rocket_bloc.dart';
+import 'blocs/launch_bloc.dart';
 import 'generated/l10n.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -16,20 +17,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => RocketBloc(RocketService()),
+        ),
+        BlocProvider(
+          create: (context) => LaunchBloc(RocketService()),
+        ),
       ],
-      supportedLocales: S.delegate.supportedLocales,
-      home: BlocProvider(
-        create: (context) => RocketBloc(RocketService()),
-        child: const HomeScreen(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+        home: const HomeScreen(),
+        theme: darkTheme,
       ),
-      theme: darkTheme,
     );
   }
 }

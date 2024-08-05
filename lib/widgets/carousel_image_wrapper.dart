@@ -6,6 +6,7 @@ import 'package:tbr_test_task/utils/constants.dart';
 
 import '../blocs/launch_bloc.dart';
 import '../blocs/rocket_bloc.dart';
+import '../generated/l10n.dart';
 
 class CarouselImageWrapper extends StatefulWidget {
   const CarouselImageWrapper({super.key});
@@ -37,7 +38,6 @@ class CarouselImageWrapperState extends State<CarouselImageWrapper> {
         } else if (state is RocketLoaded) {
           final imageUrls = state.imageUrls;
           final selectedRocketId = state.selectedRocketId;
-
           context.read<LaunchBloc>().add(FetchLaunches(selectedRocketId));
 
           return Column(
@@ -62,9 +62,8 @@ class CarouselImageWrapperState extends State<CarouselImageWrapper> {
                   enlargeFactor: 0.2,
                   onPageChanged: (index, reason) {
                     _currentPageNotifier.value = index;
-                    final rocketId = imageUrls[
-                        index]; // Adjust to fetch the correct rocketId
-                    context.read<RocketBloc>().add(ChangeRocket(rocketId));
+                    final imageUrl = imageUrls[index];
+                    context.read<RocketBloc>().add(ChangeRocket(imageUrl));
                   },
                 ),
               ),
@@ -104,11 +103,11 @@ class CarouselImageWrapperState extends State<CarouselImageWrapper> {
           );
         } else if (state is RocketError) {
           return Center(
-            child: Text('Error: ${state.message}'),
+            child: Text('${S.of(context).error}: ${state.message}'),
           );
         } else {
-          return const Center(
-            child: Text('No data available'),
+          return Center(
+            child: Text(S.of(context).no_data),
           );
         }
       },

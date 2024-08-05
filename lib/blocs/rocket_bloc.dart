@@ -10,12 +10,12 @@ abstract class RocketEvent extends Equatable {
 class FetchRocketImages extends RocketEvent {}
 
 class ChangeRocket extends RocketEvent {
-  final String rocketId;
+  final String imageUrl;
 
-  ChangeRocket(this.rocketId);
+  ChangeRocket(this.imageUrl);
 
   @override
-  List<Object> get props => [rocketId];
+  List<Object> get props => [imageUrl];
 }
 
 abstract class RocketState extends Equatable {
@@ -58,11 +58,12 @@ class RocketBloc extends Bloc<RocketEvent, RocketState> {
       FetchRocketImages event, Emitter<RocketState> emit) async {
     emit(RocketLoading());
     try {
-      final List<Map<String, String>> imageUrls =
+      final List<Map<String, String>> rocketImages =
           await rocketService.fetchRocketImages();
       final List<String> urls =
-          imageUrls.map((map) => map['image_url']!).toList();
-      final String firstRocketId = imageUrls.first['rocket_id']!;
+          rocketImages.map((map) => map['image_url']!).toList();
+      final String firstRocketId =
+          rocketImages.isNotEmpty ? rocketImages.first['rocket_id']! : '';
 
       emit(RocketLoaded(urls, firstRocketId));
     } catch (e) {
@@ -70,10 +71,19 @@ class RocketBloc extends Bloc<RocketEvent, RocketState> {
     }
   }
 
-  void _onChangeRocket(ChangeRocket event, Emitter<RocketState> emit) {
+  void _onChangeRocket(ChangeRocket event, Emitter<RocketState> emit) async {
     final state = this.state;
     if (state is RocketLoaded) {
-      emit(RocketLoaded(state.imageUrls, event.rocketId));
+      final rocketId = state.imageUrls.indexOf(event.imageUrl);
+      final newRocketId = rocketId != -1 ? state.imageUrls[rocketId] : '';
+      final rocketImages = await rocketService.fetchRocketImages();
+      final matchingRocket = rocketImages.firstWhere(
+        (rocket) => rocket['image_url'] == event.imageUrl,
+        orElse: () => {'rocket_id': ''},
+      );
+      final rocketIdFromImage = matchingRocket['rocket_id'] ?? '';
+
+      emit(RocketLoaded(state.imageUrls, rocketIdFromImage));
     }
   }
 }

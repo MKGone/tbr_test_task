@@ -17,6 +17,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String? selectedRocketId;
+
+  void _onRocketSelected(String rocketId) {
+    setState(() {
+      selectedRocketId = rocketId;
+      context.read<LaunchBloc>().add(FetchLaunches(rocketId));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 create: (context) => LaunchBloc(RocketService()),
                 child: Column(
                   children: [
-                    const CarouselImageWrapper(),
+                    CarouselImageWrapper(),
                     const SizedBox(height: 24.0),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -126,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                 ),
-                                              )
+                                              ),
                                             ],
                                           ),
                                           onTap: () {
