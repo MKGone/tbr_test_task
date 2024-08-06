@@ -74,8 +74,6 @@ class RocketBloc extends Bloc<RocketEvent, RocketState> {
   void _onChangeRocket(ChangeRocket event, Emitter<RocketState> emit) async {
     final state = this.state;
     if (state is RocketLoaded) {
-      final rocketId = state.imageUrls.indexOf(event.imageUrl);
-      final newRocketId = rocketId != -1 ? state.imageUrls[rocketId] : '';
       final rocketImages = await rocketService.fetchRocketImages();
       final matchingRocket = rocketImages.firstWhere(
         (rocket) => rocket['image_url'] == event.imageUrl,

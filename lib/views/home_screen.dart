@@ -6,6 +6,7 @@ import 'package:tbr_test_task/blocs/launch_bloc.dart';
 import 'package:tbr_test_task/services/rocket_service.dart';
 import 'package:tbr_test_task/widgets/carousel_image_wrapper.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../generated/l10n.dart';
 import '../utils/constants.dart';
 
@@ -18,14 +19,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? selectedRocketId;
-
-  void _onRocketSelected(String rocketId) {
-    setState(() {
-      selectedRocketId = rocketId;
-      context.read<LaunchBloc>().add(FetchLaunches(rocketId));
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 create: (context) => LaunchBloc(RocketService()),
                 child: Column(
                   children: [
-                    CarouselImageWrapper(),
+                    const CarouselImageWrapper(),
                     const SizedBox(height: 24.0),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -138,9 +131,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ],
                                           ),
-                                          onTap: () {
-                                            if (kDebugMode) {
-                                              print(launch['wiki']);
+                                          onTap: () async {
+                                            final urlString = launch['wiki'];
+                                            if (urlString != null) {
+                                              final Uri url =
+                                                  Uri.parse(urlString);
+                                              if (await canLaunchUrl(url)) {
+                                                await launchUrl(url);
+                                              } else {
+                                                if (kDebugMode) {
+                                                  print(
+                                                      '${S.of(context).could_not_launch} $url');
+                                                }
+                                              }
                                             }
                                           },
                                         ),
