@@ -1,0 +1,7 @@
+{
+  "app_bar_title": "SpaceX Launches",
+  "missions": "Missions",
+  "error": "Error",
+  "no_data": "No data available",
+  "could_not_launch": "Could not launch"
+}
